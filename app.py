@@ -11,9 +11,9 @@ from components.health_check import health_check_component
 
 # BASE_URL = "http://localhost:8000"
 # BASE_URL = "https://travelbackend-4snf.onrender.com/"
-# BASE_URL = "https://travelbackend-4snf.onrender.com"
+BASE_URL = "https://travelbackend-4snf.onrender.com"
 
-BASE_URL = "http://localhost:8000"
+# BASE_URL = "http://localhost:8000"
 
 # App Title
 st.title("OLA Maps API Interface")
