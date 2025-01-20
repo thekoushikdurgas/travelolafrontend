@@ -1,7 +1,9 @@
+import json
+import base64
 import streamlit as st
 from utils.api import call_api
 
-def tiles_component(base_url):
+def tiles_component(base_url: str):
     st.header("Tiles API")
     
     endpoints = [
@@ -13,25 +15,56 @@ def tiles_component(base_url):
     ]
     action = st.radio("Choose Endpoint", endpoints)
 
-    # Get All Styles
+    # ----------------------------------------------------------------
+    # 1) Get All Styles
+    # ----------------------------------------------------------------
     if action == "Get All Styles":
+        st.subheader("Get All Styles")
         submit = st.button("Fetch All Styles")
         
         if submit:
-            response = call_api("GET", f"{base_url}/tiles/styles.json")
-            st.json(response.json())
+            with st.spinner("Fetching all styles..."):
+                try:
+                    response = call_api("GET", f"{base_url}/tiles/styles.json")
+                    resp_json = response.json()
+                    
+                    if "error" in resp_json:
+                        st.error(f"Error {resp_json['code']}: {resp_json['details']}")
+                    else:
+                        st.success("Styles fetched successfully!")
+                        st.json(resp_json)
+                except Exception as e:
+                    st.error(f"Error fetching styles: {str(e)}")
 
-    # Get Style Details
+    # ----------------------------------------------------------------
+    # 2) Get Style Details
+    # ----------------------------------------------------------------
     elif action == "Get Style Details":
+        st.subheader("Get Style Details")
         style_name = st.text_input("Style Name", value="default-light-standard")
         submit = st.button("Fetch Style Details")
         
         if submit:
-            response = call_api("GET", f"{base_url}/tiles/styles/{style_name}/style.json")
-            st.json(response.json())
+            with st.spinner(f"Fetching details for style '{style_name}'..."):
+                try:
+                    endpoint = f"/tiles/styles/{style_name}/style.json"
+                    response = call_api("GET", f"{base_url}{endpoint}")
+                    resp_json = response.json()
+                    
+                    if "error" in resp_json:
+                        st.error(f"Error {resp_json['code']}: {resp_json['details']}")
+                    else:
+                        st.success(f"Style '{style_name}' details fetched successfully!")
+                        st.json(resp_json)
+                except Exception as e:
+                    st.error(f"Error fetching style details: {str(e)}")
 
-    # Get Static Map by Center Point
+    # ----------------------------------------------------------------
+    # 3) Get Static Map by Center Point
+    # ----------------------------------------------------------------
     elif action == "Get Static Map by Center Point":
+        st.subheader("Get Static Map by Center Point")
+        
         style_name = st.text_input("Style Name", value="default-light-standard")
         lon = st.number_input("Longitude", value=77.61, format="%.6f")
         lat = st.number_input("Latitude", value=12.93, format="%.6f")
@@ -41,24 +74,45 @@ def tiles_component(base_url):
         image_format = st.selectbox("Image Format", ["png", "jpg"], index=0)
         marker = st.text_area(
             "Marker (optional)",
-            placeholder="Format: lng,lat|iconColor|scale|offset",
+            placeholder="Format: lng,lat|color|options",
             help="Example: 77.61,12.93|red|scale:0.9"
         )
         path = st.text_area(
             "Path (optional)",
-            placeholder="Format: lng,lat|lng,lat|width|stroke",
+            placeholder="Format: lng,lat|lng,lat|options",
             help="Example: 77.61,12.93|77.6119,12.9376|width:6|stroke:#00ff44"
         )
         submit = st.button("Fetch Static Map")
         
         if submit:
-            params = {"marker": marker, "path": path}
-            endpoint = f"/tiles/v1/styles/{style_name}/static/{lon},{lat},{zoom}/{width}x{height}.{image_format}"
-            response = call_api("GET", f"{base_url}{endpoint}", params=params)
-            st.image(response.content)
+            with st.spinner("Fetching static map by center point..."):
+                try:
+                    params = {
+                        "marker": marker if marker.strip() else None,
+                        "path": path if path.strip() else None
+                    }
+                    endpoint = f"/tiles/v1/styles/{style_name}/static/{lon},{lat},{zoom}/{width}x{height}.{image_format}"
+                    response = call_api("GET", f"{base_url}{endpoint}", params=params)
+                    resp_json = response.json()
+                    
+                    if "error" in resp_json:
+                        st.error(f"Error {resp_json['code']}: {resp_json['details']}")
+                    else:
+                        if "image_data" in resp_json:
+                            # Decode base64 and display image
+                            image_bytes = base64.b64decode(resp_json["image_data"])
+                            st.image(image_bytes, caption="Static Map by Center Point")
+                        else:
+                            st.json(resp_json)
+                except Exception as e:
+                    st.error(f"Error fetching static map by center point: {str(e)}")
 
-    # Get Static Map by Bounding Box
+    # ----------------------------------------------------------------
+    # 4) Get Static Map by Bounding Box
+    # ----------------------------------------------------------------
     elif action == "Get Static Map by Bounding Box":
+        st.subheader("Get Static Map by Bounding Box")
+        
         style_name = st.text_input("Style Name", value="default-light-standard")
         minx = st.number_input("Min Longitude", value=77.611182, format="%.6f")
         miny = st.number_input("Min Latitude", value=12.932198, format="%.6f")
@@ -69,26 +123,56 @@ def tiles_component(base_url):
         image_format = st.selectbox("Image Format", ["png", "jpg"], index=0)
         marker = st.text_area(
             "Marker (optional)",
-            placeholder="Format: lng,lat|iconColor|scale|offset",
+            placeholder="Format: lng,lat|color|options",
             help="Example: 77.61,12.93|red|scale:0.9"
         )
         path = st.text_area(
             "Path (optional)",
-            placeholder="Format: lng,lat|lng,lat|width|stroke",
+            placeholder="Format: lng,lat|lng,lat|options",
             help="Example: 77.61,12.93|77.6119,12.9376|width:6|stroke:#00ff44"
         )
         submit = st.button("Fetch Static Map by Bounding Box")
         
         if submit:
-            params = {"marker": marker, "path": path}
-            endpoint = f"/tiles/v1/styles/{style_name}/static/{minx},{miny},{maxx},{maxy}/{width}x{height}.{image_format}"
-            response = call_api("GET", f"{base_url}{endpoint}", params=params)
-            st.image(response.content)
+            with st.spinner("Fetching static map by bounding box..."):
+                try:
+                    params = {
+                        "marker": marker if marker.strip() else None,
+                        "path": path if path.strip() else None
+                    }
+                    endpoint = f"/tiles/v1/styles/{style_name}/static/{minx},{miny},{maxx},{maxy}/{width}x{height}.{image_format}"
+                    response = call_api("GET", f"{base_url}{endpoint}", params=params)
+                    resp_json = response.json()
+                    
+                    if "error" in resp_json:
+                        st.error(f"Error {resp_json['code']}: {resp_json['details']}")
+                    else:
+                        if "image_data" in resp_json:
+                            # Decode base64 and display image
+                            image_bytes = base64.b64decode(resp_json["image_data"])
+                            st.image(image_bytes, caption="Static Map by Bounding Box")
+                        else:
+                            st.json(resp_json)
+                except Exception as e:
+                    st.error(f"Error fetching static map by bounding box: {str(e)}")
 
-    # Get 3D Tiles
+    # ----------------------------------------------------------------
+    # 5) Get 3D Tiles
+    # ----------------------------------------------------------------
     elif action == "Get 3D Tiles":
+        st.subheader("Get 3D Tiles")
         submit = st.button("Fetch 3D Tiles")
         
         if submit:
-            response = call_api("GET", f"{base_url}/tiles/3dtiles/tileset.json")
-            st.json(response.json())
+            with st.spinner("Fetching 3D tiles..."):
+                try:
+                    response = call_api("GET", f"{base_url}/tiles/3dtiles/tileset.json")
+                    resp_json = response.json()
+                    
+                    if "error" in resp_json:
+                        st.error(f"Error {resp_json['code']}: {resp_json['details']}")
+                    else:
+                        st.success("3D Tiles fetched successfully!")
+                        st.json(resp_json)
+                except Exception as e:
+                    st.error(f"Error fetching 3D tiles: {str(e)}")

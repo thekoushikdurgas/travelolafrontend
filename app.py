@@ -1,5 +1,4 @@
 import streamlit as st
-from utils.logger import logger
 from components.routing import routing_component
 from components.elevation import elevation_component
 from components.geocode import geocode_component

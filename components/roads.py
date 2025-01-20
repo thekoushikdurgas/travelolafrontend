@@ -1,16 +1,19 @@
+import json
 import streamlit as st
 from utils.api import call_api
 
-def roads_component(base_url):
+def roads_component(base_url: str):
     st.header("Roads API")
 
     endpoints = ["Snap to Road API", "Nearest Roads API", "Speed Limits API"]
     action = st.radio("Choose Endpoint", endpoints)
 
     # ----------------------------------------------------------------
-    # 1) Snap to Road
+    # 1) Snap to Road API
     # ----------------------------------------------------------------
     if action == "Snap to Road API":
+        st.subheader("Snap to Road API")
+
         points = st.text_area(
             "Coordinates (lat,lng|lat,lng)",
             placeholder="Enter points separated by '|'. e.g.: 12.931544865377818,77.61638622280486|12.9352,77.6245",
@@ -31,15 +34,22 @@ def roads_component(base_url):
                         url=f"{base_url}/snapToRoad",
                         params=params
                     )
-                    st.json(response.json())
+                    resp_json = response.json()
+
+                    if "error" in resp_json:
+                        st.error(f"Error {resp_json['code']}: {resp_json['details']}")
+                    else:
+                        st.success("Snapped to road successfully!")
+                        st.json(resp_json)
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
 
-
     # ----------------------------------------------------------------
-    # 2) Nearest Roads
+    # 2) Nearest Roads API
     # ----------------------------------------------------------------
     elif action == "Nearest Roads API":
+        st.subheader("Nearest Roads API")
+
         points = st.text_area(
             "Coordinates (lat,lng|lat,lng)",
             placeholder="Enter points separated by '|'. e.g.: 12.931544865377818,77.61638622280486|12.9352,77.6245",
@@ -60,18 +70,25 @@ def roads_component(base_url):
                         url=f"{base_url}/nearestRoads",
                         params=params
                     )
-                    st.json(response.json())
+                    resp_json = response.json()
+
+                    if "error" in resp_json:
+                        st.error(f"Error {resp_json['code']}: {resp_json['details']}")
+                    else:
+                        st.success("Nearest roads retrieved successfully!")
+                        st.json(resp_json)
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
 
-
     # ----------------------------------------------------------------
-    # 3) Speed Limits
+    # 3) Speed Limits API
     # ----------------------------------------------------------------
     elif action == "Speed Limits API":
+        st.subheader("Speed Limits API")
+
         points = st.text_area(
             "Coordinates (lat,lng|lat,lng)",
-            placeholder="Enter points separated by '|'. e.g.: 12.931544865377818,77.61638622280486|12.9352,77.6245",
+            placeholder="Enter points separated by '|'. e.g.: 13.0630227,77.5930842|13.063479498221085,77.59321523175956",
             value="13.0630227,77.5930842|13.063479498221085,77.59321523175956"
         )
         snap_strategy = st.selectbox(
@@ -94,6 +111,12 @@ def roads_component(base_url):
                         url=f"{base_url}/speedLimits",
                         params=params
                     )
-                    st.json(response.json())
+                    resp_json = response.json()
+
+                    if "error" in resp_json:
+                        st.error(f"Error {resp_json['code']}: {resp_json['details']}")
+                    else:
+                        st.success("Speed limits retrieved successfully!")
+                        st.json(resp_json)
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
