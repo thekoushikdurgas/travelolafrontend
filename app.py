@@ -8,9 +8,9 @@ from components.roads import roads_component
 from components.tiles import tiles_component
 from components.health_check import health_check_component
 
-# BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:8000"
 # BASE_URL = "https://travelbackend-4snf.onrender.com/"
-BASE_URL = "https://travelbackend-4snf.onrender.com"
+# BASE_URL = "https://travelbackend-4snf.onrender.com"
 
 # BASE_URL = "http://localhost:8000"
 
@@ -37,14 +37,14 @@ if api_choice == "Elevation API":
 elif api_choice == "Routing API":
     routing_component(BASE_URL+"/routing")
 elif api_choice == "Geocode API":
-    geocode_component(BASE_URL)
+    geocode_component(BASE_URL+"/geocode")
 elif api_choice == "Geofence API":
     geofence_component(BASE_URL+"/geofence")
 elif api_choice == "Places API":
-    places_component(BASE_URL)
+    places_component(BASE_URL+"/places")
 elif api_choice == "Roads API":
     roads_component(BASE_URL+"/roads")
 elif api_choice == "Tiles API":
-    tiles_component(BASE_URL)
+    tiles_component(BASE_URL+"/tiles")
 elif api_choice == "Health Check":
     health_check_component(BASE_URL)

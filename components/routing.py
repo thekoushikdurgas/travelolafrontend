@@ -41,7 +41,7 @@ def routing_component(base_url: str):
                     response = call_api(
                         method="POST",
                         url=f"{base_url}/directions/basic",
-                        json=payload
+                        body=payload
                     )
                     resp_json = response.json()
                     
@@ -78,7 +78,7 @@ def routing_component(base_url: str):
                     response = call_api(
                         method="POST",
                         url=f"{base_url}/directions",
-                        json=payload
+                        body=payload
                     )
                     resp_json = response.json()
                     
@@ -188,7 +188,7 @@ def routing_component(base_url: str):
                     response = call_api(
                         method="POST",
                         url=f"{base_url}/routeOptimizer",
-                        json=payload
+                        body=payload
                     )
                     resp_json = response.json()
                     
